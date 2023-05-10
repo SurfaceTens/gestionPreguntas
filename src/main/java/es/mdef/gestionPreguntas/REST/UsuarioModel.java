@@ -45,13 +45,13 @@ public class UsuarioModel extends RepresentationModel<UsuarioModel> {
 		this.username = username;
 	}
 
-//	public void setPassword(String password) {
-//		this.password = password;
-//	}
-//
-//	public String getPassword() {
-//		return password;
-//	}
+	public void setPassword(String password) {
+		this.password = password;
+	}
+
+	public String getPassword() {
+		return password;
+	}
 
 	public void setRol(Rol rol) {
 		this.rol = rol;
@@ -87,7 +87,9 @@ public class UsuarioModel extends RepresentationModel<UsuarioModel> {
 
 	@Override
 	public String toString() {
-		return "UsuarioModel [Nombre=" + nombre + ", UserName=" + username + "ROL" + rol + "]";
+		return "UsuarioModel [nombre=" + nombre + ", username=" + username + ", password=" + password + ", rol=" + rol
+				+ ", telefono=" + telefono + ", dpto=" + dpto + ", tipo=" + tipo + ", numPreguntas=" + numPreguntas
+				+ "]";
 	}
 
 }

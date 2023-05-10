@@ -27,7 +27,7 @@ public class PreguntaPostModel extends RepresentationModel<PreguntaPostModel> {
 
 	@Override
 	public String toString() {
-		return "PreguntaModel [enunciado=" + enunciado + "]";
+		return "PreguntaPostModel [enunciado=" + enunciado + ", usuario=" + usuario + ", familia=" + familia + "]";
 	}
 
 }

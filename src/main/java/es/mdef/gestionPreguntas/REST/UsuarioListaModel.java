@@ -10,7 +10,6 @@ public class UsuarioListaModel extends RepresentationModel<UsuarioListaModel> {
 	private String nombre;
 	private String nombreUsuario;
 	private Rol rol;
-	// private UsuarioEstado estado;
 
 	public String getNombre() {
 		return nombre;
@@ -20,13 +19,13 @@ public class UsuarioListaModel extends RepresentationModel<UsuarioListaModel> {
 		this.nombre = nombre;
 	}
 
-//	public String getNombreUsuario() {
-//		return nombreUsuario;
-//	}
-//	
-//	public void setNombreUsuario(String nombreUsuario) {
-//		this.nombreUsuario = nombreUsuario;
-//	}
+	public String getNombreUsuario() {
+		return nombreUsuario;
+	}
+
+	public void setNombreUsuario(String nombreUsuario) {
+		this.nombreUsuario = nombreUsuario;
+	}
 
 	public Rol getRol() {
 		return rol;
@@ -38,7 +37,7 @@ public class UsuarioListaModel extends RepresentationModel<UsuarioListaModel> {
 
 	@Override
 	public String toString() {
-		return "UsuarioModel [nombre=" + nombre + ", Rol=" + rol + "]";
+		return "UsuarioListaModel [nombre=" + nombre + ", nombreUsuario=" + nombreUsuario + ", rol=" + rol + "]";
 	}
 
 }

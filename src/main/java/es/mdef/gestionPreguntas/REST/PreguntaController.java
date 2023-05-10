@@ -1,11 +1,7 @@
 package es.mdef.gestionPreguntas.REST;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.slf4j.Logger;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,19 +9,11 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
-import es.mdef.gestionPreguntas.validation.RegisterNotFoundException;
 import es.mdef.gestionPreguntas.GestionPreguntasApplication;
-import es.mdef.gestionPreguntas.entidades.Administrador;
-import es.mdef.gestionPreguntas.entidades.Familia;
-import es.mdef.gestionPreguntas.entidades.NoAdministrador;
 import es.mdef.gestionPreguntas.entidades.Pregunta;
-import es.mdef.gestionPreguntas.entidades.Usuario;
-import es.mdef.gestionPreguntas.entidades.Usuario.Rol;
 import es.mdef.gestionPreguntas.repositorios.PreguntaRepositorio;
-import es.mdef.gestionPreguntas.repositorios.UsuarioRepositorio;
 import jakarta.validation.Valid;
 
 @RestController
@@ -34,7 +22,6 @@ public class PreguntaController {
 	private final PreguntaRepositorio repositorio;
 	private final PreguntaAssembler prAssembler;
 	private final PreguntaListaAssembler listaAssembler;
-	private final UsuarioAssembler usuAsembler;
 	private final Logger log;
 
 	PreguntaController(PreguntaRepositorio repositorio, PreguntaAssembler prAssembler,
@@ -42,7 +29,6 @@ public class PreguntaController {
 		this.repositorio = repositorio;
 		this.prAssembler = prAssembler;
 		this.listaAssembler = listaAssembler;
-		this.usuAsembler = usuAsembler;
 		log = GestionPreguntasApplication.log;
 	}
 
@@ -52,52 +38,10 @@ public class PreguntaController {
 		return prAssembler.toModel(pregunta);
 	}
 
-	@GetMapping("/preguntasminfamilia")
-	public CollectionModel<PreguntaListaModel> getPreguntasPorMinFamilia(
-			@RequestParam(value = "minFamilia", required = false) Long minFamilia) {
-		List<Pregunta> preguntas;
-		if (minFamilia != null) {
-			preguntas = repositorio.preguntasMinFamilias(minFamilia);
-		} else {
-			preguntas = repositorio.findAll();
-		}
-		return listaAssembler.toCollection(preguntas);
-	}
-
-	@GetMapping("/preguntasminfamilia2")
-	public CollectionModel<PreguntaListaModel> getPreguntasMinFamilia2(
-			@RequestParam(value = "minFamilia", required = false) Long minFamilia) {
-		List<Pregunta> preguntas = repositorio.findAll();
-		if (minFamilia != null) {
-			preguntas = preguntas.stream().filter(p -> p.getFamilia() != null && p.getFamilia().getId() > minFamilia)
-					.collect(Collectors.toList());
-		}
-
-		return listaAssembler.toCollection(preguntas);
-	}
-
 	@GetMapping
 	public CollectionModel<PreguntaListaModel> all() {
 		return listaAssembler.toCollection(repositorio.findAll());
 	}
-
-//	@GetMapping("{id}/usuario")
-//	public UsuarioModel usuariosdePregunta(@PathVariable Long id) {
-//		   Pregunta pregunta = repositorio.findById(id)
-//		            .orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));
-//
-//		      Usuario usu = pregunta.getUsuario();
-//		      if (usu.getRol() == Rol.Administrator)
-//		      {
-//		    	  Administrador admin = new Administrador();
-//		    	  usu = admin;
-//		      } else {
-//		    	  NoAdministrador noAdmin = new NoAdministrador();
-//		    	  usu = noAdmin;
-//		      }
-//
-//		    return usuAsembler.toModel(usu);	    
-//	}
 
 	@PostMapping
 	public PreguntaModel add(@Valid @RequestBody PreguntaPostModel model) {
@@ -120,14 +64,10 @@ public class PreguntaController {
 
 	@DeleteMapping("{id}")
 	public void delete(@PathVariable Long id) {
-
-		Pregunta pregunta = repositorio.findById(id).map(preg -> {
+		log.info("Pregunta eliminada: " + id);
+		repositorio.findById(id).ifPresent(preg -> {
 			repositorio.deleteById(id);
-			return preg;
-		}).orElseThrow(() -> new RegisterNotFoundException(id, "pregunta"));
-		log.info("Actualizado " + pregunta);
-		log.info("Borrado pregunta " + id);
-
+		});
 	}
 
 }

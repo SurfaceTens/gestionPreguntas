@@ -5,7 +5,6 @@ import java.util.stream.Collectors;
 
 import org.slf4j.Logger;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -13,19 +12,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import es.mdef.gestionPreguntas.GestionPreguntasApplication;
-import es.mdef.gestionPreguntas.entidades.Administrador;
-import es.mdef.gestionPreguntas.entidades.NoAdministrador;
 import es.mdef.gestionPreguntas.entidades.Pregunta;
 import es.mdef.gestionPreguntas.entidades.Usuario;
 import es.mdef.gestionPreguntas.entidades.Familia;
-import es.mdef.gestionPreguntas.entidades.Familia;
 import es.mdef.gestionPreguntas.repositorios.FamiliaRepositorio;
-import es.mdef.gestionPreguntas.repositorios.PreguntaRepositorio;
-import es.mdef.gestionPreguntas.validation.RegisterNotFoundException;
+//import es.mdef.gestionPreguntas.validation.RegisterNotFoundException;
 import jakarta.validation.Valid;
 
 @RestController
@@ -48,15 +42,6 @@ public class FamiliaController {
 		this.usuListaAssembler = userListaAssembler;
 		log = GestionPreguntasApplication.log;
 	}
-
-//		@GetMapping("{id}")
-//		public EntityModel<Familia> one(@PathVariable Long id) {
-//			Familia familia = repositorio.findById(id)
-//					.orElseThrow(() -> new RegisterNotFoundException(id, "familia"));
-//			log.info("Recuperado " + familia);
-//			//return assembler.toModel(familia);
-//			return EntityModel.of(familia);
-//		}
 
 	@GetMapping("{id}")
 	public FamiliaModel one(@PathVariable Long id) {
@@ -87,9 +72,6 @@ public class FamiliaController {
 	public FamiliaModel edit(@Valid @PathVariable Long id, @RequestBody FamiliaPostModel model) {
 
 		Familia familia = repositorio.findById(id).map(fam -> {
-			// al tener solo un atributo, no merece la pena consultar que sea nulo
-			// el comportamenitno es igual que en un put (validar en el modelo)
-			// if (model.getEnunciado() != null) fam.setEnunciado(model.getEnunciado());
 			fam.setEnunciado(model.getEnunciado());
 			return repositorio.save(fam);
 		}).orElseThrow(() -> new RegisterNotFoundException(id, "Familia"));
@@ -110,10 +92,9 @@ public class FamiliaController {
 	@DeleteMapping("{id}")
 	public void delete(@PathVariable Long id) {
 		log.info("Borrado Familia " + id);
-		Familia familia = repositorio.findById(id).map(fam -> {
+		repositorio.findById(id).ifPresent(fam -> {
 			repositorio.deleteById(id);
-			return fam;
-		}).orElseThrow(() -> new RegisterNotFoundException(id, "familia"));
+		});
 	}
 
 }

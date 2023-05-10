@@ -1,17 +1,11 @@
 package es.mdef.gestionPreguntas.REST;
 
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
-import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
-
-import org.springframework.web.client.RestTemplate;
-
 import java.util.List;
 import java.util.stream.Collectors;
 
 //import org.glassfish.jaxb.runtime.v2.schemagen.xmlschema.List;
 import org.slf4j.Logger;
 import org.springframework.hateoas.CollectionModel;
-import org.springframework.hateoas.EntityModel;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -22,12 +16,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.client.RestTemplate;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import es.mdef.gestionPreguntas.validation.RegisterNotFoundException;
+//import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import es.mdef.gestionPreguntas.GestionPreguntasApplication;
 import es.mdef.gestionPreguntas.entidades.Administrador;
 import es.mdef.gestionPreguntas.entidades.Familia;
@@ -65,23 +54,13 @@ public class UsuarioController {
 		return assembler.toModel(usuario);
 	}
 
-	// probamos este metodo
 	@GetMapping("/buscarusuario")
 	public UsuarioModel getByUsername(@RequestParam(value = "username") String username) {
 		Usuario usuario = repositorio.findByUsername(username)
-				.orElseThrow(() -> new RegisterNotFoundException(username, "usuario"));
+				.orElseThrow(() -> new RegisterNotFoundException(username));
 		log.info("Recuperado " + usuario);
 		return assembler.toModel(usuario);
 	}
-
-	// ejemplo peticion get sin Assembler
-//	@GetMapping("{id}")
-//	public EntityModel<Usuario>  one(@PathVariable Long id) {
-//		Usuario usuario = repositorio.findById(id)
-//				.orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
-//		log.info("Recuperado " + usuario);
-//		return assembler.toModel2(usuario);
-//	}
 
 	@GetMapping
 	public CollectionModel<UsuarioListaModel> all() {
@@ -97,10 +76,8 @@ public class UsuarioController {
 	@GetMapping("{id}/familias")
 	public CollectionModel<FamiliaListaModel> familiasDeUsuario(@PathVariable Long id) {
 		Usuario usuario = repositorio.findById(id).orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
-
 		List<Familia> familias = usuario.getPreguntas().stream().map(Pregunta::getFamilia).distinct()
 				.collect(Collectors.toList());
-
 		return famListaAssembler.toCollection(familias);
 	}
 
@@ -109,34 +86,23 @@ public class UsuarioController {
 		Usuario usuario = repositorio.save(assembler.toEntity(model));
 		log.info("Añadido " + usuario);
 		return assembler.toModel(usuario);
-		// return assembler.toModelPost(usuario);
 	}
 
 	@PutMapping("{id}")
 	public UsuarioModel edit(@Valid @PathVariable Long id, @RequestBody UsuarioPutModel model) {
 		Usuario usuario = repositorio.findById(id).map(usu -> {
 			log.info("PUT MODEL" + model);
-
-			// el nombre y username nunca van a ser nullos, porque lo controlamos en el
-			// post.
 			String nombre = model.getNombre();
 			String username = model.getNombre();
 
-			// solamente actualizamos los datos necesarios de cada rol cuando corresponda
 			if (model.getRol() == Rol.Administrator) {
 				Administrador admin = new Administrador();
 
 				if (model.getTelefono() != null) {
-					// solo actualizamos la bbdd en caso de que el tlf
-					// en caso contrario, se devolverá un error controlado
 					repositorio.actualizarUsuarioAdmin(nombre, username, model.getTelefono(), id);
 				}
 
-				// si es nulo fallará la validación, ,tampoco se habrá hecho el update en bbdd
 				admin.setTelefono(model.getTelefono());
-
-				// si en el modelo son nulos (es decir, no se quieren actualilar), devolvemos
-				// los del repositorio
 				admin.setNombre(model.getNombre());
 				admin.setUsername(model.getUsername());
 				admin.setPassword(usu.getPassword());
@@ -146,33 +112,20 @@ public class UsuarioController {
 				NoAdministrador noAdmin = new NoAdministrador();
 
 				if (model.getDpto() != null && model.getTipo() != null) {
-					// solo actualizamos la bbdd en caso de que ambos sean no nulos
-					// en caso contrario, se devolverá un error controlado
 					repositorio.actualizarUsuarioNoAdmin(nombre, username, model.getDpto().ordinal(),
 							model.getTipo().ordinal(), id);
 				}
-				// si son nulos fallará la validación,tampoco se habrá hecho el update en bbdd
 				noAdmin.setDpto(model.getDpto());
 				noAdmin.setTipo(model.getTipo());
-
 				noAdmin.setNombre(model.getNombre());
 				noAdmin.setUsername(model.getUsername());
-
 				noAdmin.setPassword(usu.getPassword());
 				usu = noAdmin;
 			}
-//	        } else //si no se indica el rol, simplemente actualizamos nombre y username
-//	        {
-//	        	if (model.getNombre() != null) usu.setNombre(model.getNombre());
-//		        if (model.getUsername() != null) usu.setUsername(model.getUsername());
-//	        }
-//	        
 			usu.setId(id);
 			return repositorio.save(usu);
 		}).orElseThrow(() -> new RegisterNotFoundException(id, "Usuario"));
 		log.info("Actualizado ---->>>> " + usuario);
-
-		// finalmente, llamamos al metodo toModel para devolver el modelo
 		return assembler.toModel(usuario);
 	}
 
@@ -181,17 +134,16 @@ public class UsuarioController {
 		log.info("Nueva password " + password);
 
 		Usuario usuario = repositorio.findById(id).map(usu -> {
-			usu.setPassword(new BCryptPasswordEncoder().encode(password));
+			usu.setPassword(/* new BCryptPasswordEncoder().encode( */password)/* ) */;
 			return repositorio.save(usu);
 		}).orElseThrow(() -> new RegisterNotFoundException(id, "Usuario"));
 		log.info("Actualizada constraseña " + usuario);
 	}
 
-	// emplementamos el método con otro endpoint usando el método PATCH
 	@PatchMapping("{id}/cambiarContrasena")
 	public UsuarioModel edit(@Valid @PathVariable Long id, @RequestBody String newPassword) {
 		Usuario usuario = repositorio.findById(id).map(usu -> {
-			usu.setPassword(new BCryptPasswordEncoder().encode(newPassword));
+			usu.setPassword(/* new BCryptPasswordEncoder().encode( */newPassword)/* ) */;
 			return repositorio.save(usu);
 		}).orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
 		log.info("Actualizado " + usuario);
@@ -200,24 +152,10 @@ public class UsuarioController {
 
 	@DeleteMapping("{id}")
 	public void delete(@PathVariable Long id) {
-
-		Usuario usuario = repositorio.findById(id).map(usu -> {
+		log.info("Usuario eliminado: " + id);
+		repositorio.findById(id).ifPresent(usr -> {
 			repositorio.deleteById(id);
-			return usu;
-		}).orElseThrow(() -> new RegisterNotFoundException(id, "usuario"));
-
-		log.info("Borrado Usuario " + id);
+		});
 	}
-
-	// private RestTemplate restTemplate;
-
-	// integración con api externa
-//	 @GetMapping("/api-materiales")
-//	    public String callExternalApi() {
-//	        String apiUrl = "https://truequet-pre-default-rtdb.europe-west1.firebasedatabase.app/materiales";
-//	        String response = restTemplate.getForObject(apiUrl, String.class);
-//	        return response;
-//	    }
-//	
 
 }

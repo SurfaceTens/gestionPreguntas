@@ -5,15 +5,15 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
-import org.hibernate.validator.constraints.UniqueElements;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+//import org.springframework.security.core.GrantedAuthority;
+//import org.springframework.security.core.authority.SimpleGrantedAuthority;
+//import org.springframework.security.core.userdetails.UserDetails;
+//import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
-import jakarta.persistence.Transient;
-import jakarta.persistence.UniqueConstraint;
 import jakarta.persistence.Column;
 import jakarta.persistence.DiscriminatorColumn;
 import jakarta.persistence.DiscriminatorType;
@@ -26,6 +26,7 @@ import jakarta.persistence.Inheritance;
 import jakarta.persistence.InheritanceType;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import jakarta.persistence.Transient;
 import jakarta.validation.constraints.NotBlank;
 
 @Entity
@@ -33,10 +34,11 @@ import jakarta.validation.constraints.NotBlank;
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "rol_usuario", discriminatorType = DiscriminatorType.CHAR)
 @DiscriminatorValue("null")
-@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
+//@JsonIgnoreProperties(value = { "hibernateLazyInitializer", "handler" })
 public class Usuario implements UserDetails {
-	private static final long serrialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;
 
+	// Variables
 	public static enum Rol {
 		Administrator, noAdministrator
 	}
@@ -53,8 +55,7 @@ public class Usuario implements UserDetails {
 	// @NotBlank(message="El username debe ser único")
 	private String username;
 
-	// private Rol rol;
-	// @NotBlank(message="la contraseña es obligatoria")
+	@NotBlank(message = "la contraseña es obligatoria")
 	private String password;
 	@Column(name = "cuenta_activa")
 	private boolean accountNonExpired = true;
@@ -106,10 +107,6 @@ public class Usuario implements UserDetails {
 		return null;
 	}
 
-//	public void setRol(Rol rol) {
-//		this.rol = rol;
-//	}
-
 	public List<Pregunta> getPreguntas() {
 		return preguntas;
 	}
@@ -151,35 +148,18 @@ public class Usuario implements UserDetails {
 		this.enabled = enabled;
 	}
 
-	// preguntar al profesor
-//	public List <FamiliaImpl> getFamilias() {
-//		 List<FamiliaImpl> familias = new ArrayList<>();
-//	    for (Pregunta pregunta : this.preguntas) {
-//	        FamiliaImpl familia = pregunta.getFamilia();
-//        	familias.add(familia);
-//    }	    
-//	    return null;
-//	    //return new ArrayList<>(familias);
-//	}
-
 	@Override
 	public String toString() {
-		return "USUARIO (DESDE clase usuario) [Nombre=" + nombre + ", NombreUSER=" + username + "   ID " + id + "]"
-				+ password;
+		return "Usuario [id=" + id + ", nombre=" + nombre + ", username=" + username + ", password=" + password
+				+ ", accountNonExpired=" + accountNonExpired + ", accountNonLocked=" + accountNonLocked
+				+ ", credentialsNonExpired=" + credentialsNonExpired + ", enabled=" + enabled + ", preguntas="
+				+ preguntas + "]";
 	}
 
+	@Transient
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
-		// TODO Auto-generated method stub
-		return null;
+		return new ArrayList<SimpleGrantedAuthority>(Arrays.asList(new SimpleGrantedAuthority(getRol().toString())));
 	}
-
-//	@Transient
-//	@Override
-//	public Collection<? extends GrantedAuthority> getAuthorities() {
-//		return new ArrayList<SimpleGrantedAuthority>(
-//				Arrays.asList(new SimpleGrantedAuthority(getRol().toString()))
-//				);
-//	}
 
 }

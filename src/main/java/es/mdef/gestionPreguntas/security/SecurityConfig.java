@@ -10,22 +10,16 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 public class SecurityConfig {
-	
+
 	@Bean
-	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration) throws Exception {
+	public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationConfiguration authenticationConfiguration)
+			throws Exception {
 		AuthenticationManager authenticationManager = authenticationConfiguration.getAuthenticationManager();
-		http.csrf()
-			.ignoringRequestMatchers("/**")
-			.and()
-			.authorizeHttpRequests()
-			.requestMatchers("/login").permitAll()
-			.requestMatchers(HttpMethod.DELETE).hasAuthority("Administrator")
-			.anyRequest().authenticated()
-			.and()
-			.addFilter(new JwtAuthenticationFilter(authenticationManager))
-			.addFilter(new JwtAuthorizationFilter(authenticationManager))
-			;
+		http.csrf().ignoringRequestMatchers("/**").and().authorizeHttpRequests().requestMatchers("/login").permitAll()
+				.requestMatchers(HttpMethod.DELETE).hasAuthority("Administrator").anyRequest().authenticated().and()
+				.addFilter(new JwtAuthenticationFilter(authenticationManager))
+				.addFilter(new JwtAuthorizationFilter(authenticationManager));
 		return http.build();
 	}
-	
+
 }

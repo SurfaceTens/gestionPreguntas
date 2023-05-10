@@ -12,12 +12,13 @@ public class UsuarioPutModel extends RepresentationModel<UsuarioPutModel> {
 
 	private String nombre;
 	private String username;
-	// controlamos aquí el rol, ya que en la entidad no existe
+
 	@NotNull(message = "El rol es obligatorio")
 	private Rol rol;
-	// atributo del administrador
+
+	// administrador
 	private String telefono;
-	// atributos del noAdministrador
+	// noAdministrador
 	private Dpto dpto;
 	private Tipo tipo;
 
@@ -47,7 +48,8 @@ public class UsuarioPutModel extends RepresentationModel<UsuarioPutModel> {
 
 	@Override
 	public String toString() {
-		return "UsuarioPutModel [Nombre=" + getNombre() + ", UserName=" + getUsername() + "ROL" + getRol();
+		return "UsuarioPutModel [nombre=" + nombre + ", username=" + username + ", rol=" + rol + ", telefono="
+				+ telefono + ", dpto=" + dpto + ", tipo=" + tipo + "]";
 	}
 
 }

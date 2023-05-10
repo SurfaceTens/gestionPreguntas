@@ -3,15 +3,10 @@ package es.mdef.gestionPreguntas.REST;
 import org.springframework.hateoas.RepresentationModel;
 import org.springframework.hateoas.server.core.Relation;
 
-import es.mdef.gestionPreguntas.entidades.Familia;
-import es.mdef.gestionPreguntas.entidades.Usuario;
-
 @Relation(itemRelation = "pregunta")
 public class PreguntaModel extends RepresentationModel<PreguntaModel> {
 
 	private String enunciado;
-	private Usuario usuario;
-	private Familia familia;
 	private String nombreDeUsuario;
 
 	public String getEnunciado() {
@@ -22,7 +17,6 @@ public class PreguntaModel extends RepresentationModel<PreguntaModel> {
 		this.enunciado = enunciado;
 	}
 
-	// ejemplo para mostrar en el Modelo el nombre del usuario
 	public String getNombreDeUsuario() {
 		return nombreDeUsuario;
 	}
@@ -33,7 +27,7 @@ public class PreguntaModel extends RepresentationModel<PreguntaModel> {
 
 	@Override
 	public String toString() {
-		return "PreguntaModel [enunciado=" + enunciado + "]";
+		return "PreguntaModel [enunciado=" + enunciado + ", nombreDeUsuario=" + nombreDeUsuario + "]";
 	}
 
 }

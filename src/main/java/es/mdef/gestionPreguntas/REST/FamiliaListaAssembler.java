@@ -19,10 +19,7 @@ public class FamiliaListaAssembler implements RepresentationModelAssembler<Famil
 	public FamiliaListaModel toModel(Familia entity) {
 		FamiliaListaModel model = new FamiliaListaModel();
 		model.setEnunciado(entity.getEnunciado());
-
-		int tamanio = entity.getPreguntas() != null ? entity.getPreguntas().size() : 0;
 		model.setTamanio(entity.getPreguntas().size());
-
 		model.add(linkTo(methodOn(FamiliaController.class).one(entity.getId())).withSelfRel());
 		return model;
 	}

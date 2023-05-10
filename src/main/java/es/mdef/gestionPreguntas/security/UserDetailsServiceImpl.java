@@ -10,16 +10,15 @@ import es.mdef.gestionPreguntas.repositorios.UsuarioRepositorio;
 @Service
 public class UserDetailsServiceImpl implements UserDetailsService {
 	private UsuarioRepositorio repositorio;
-	
+
 	public UserDetailsServiceImpl(UsuarioRepositorio repositorio) {
 		this.repositorio = repositorio;
 	}
 
 	@Override
 	public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-		return repositorio.findByUsername(username)
-				.orElseThrow(() -> new UsernameNotFoundException(
-						"Usuario " + username + " no encontrado"));
+		return (UserDetails) repositorio.findByUsername(username)
+				.orElseThrow(() -> new UsernameNotFoundException("Usuario " + username + " no encontrado"));
 	}
 
 }

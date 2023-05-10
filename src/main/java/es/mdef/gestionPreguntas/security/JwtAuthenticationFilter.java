@@ -23,34 +23,34 @@ import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
-    private AuthenticationManager authenticationManager;
+	private AuthenticationManager authenticationManager;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
-        this.authenticationManager = authenticationManager;
-    }
-    
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
-    	Claims claims = new DefaultClaims();
-        HashMap<String, Object> responseBody = new HashMap<>();
+	public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
+		this.authenticationManager = authenticationManager;
+	}
 
-        String username = ((UserDetails) authResult.getPrincipal()).getUsername();
+	@Override
+	protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
+			Authentication authResult) throws IOException, ServletException {
+		Claims claims = new DefaultClaims();
+		HashMap<String, Object> responseBody = new HashMap<>();
 
-        List<String> authorities = authResult.getAuthorities().stream()
-                .map(role -> role.getAuthority())
-                .collect(Collectors.toList());
-        claims.put("authorities", authorities);
+		String username = ((UserDetails) authResult.getPrincipal()).getUsername();
 
-        String token = JwtTokenService.generateToken(username, claims);
+		List<String> authorities = authResult.getAuthorities().stream().map(role -> role.getAuthority())
+				.collect(Collectors.toList());
+		claims.put("authorities", authorities);
 
-        responseBody.put("token", token);
-        response.setContentType(MediaType.APPLICATION_JSON_VALUE);
-        new ObjectMapper().writeValue(response.getWriter(), responseBody);
-    }
-    
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
-        return authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(request.getParameter("username"), request.getParameter("password")));
-    }
+		String token = JwtTokenService.generateToken(username, claims);
+
+		responseBody.put("token", token);
+		response.setContentType(MediaType.APPLICATION_JSON_VALUE);
+		new ObjectMapper().writeValue(response.getWriter(), responseBody);
+	}
+
+	@Override
+	public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) {
+		return authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(
+				request.getParameter("username"), request.getParameter("password")));
+	}
 }
