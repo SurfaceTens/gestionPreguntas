@@ -11,6 +11,7 @@ public class GestionPreguntasApplication {
 	public static final Logger log = LoggerFactory.getLogger(GestionPreguntasApplication.class);
 
 	public static void main(String[] args) {
+		System.err.println(new BCryptPasswordEncoder().encode("12"));
 		SpringApplication.run(GestionPreguntasApplication.class, args);
 	}
 
