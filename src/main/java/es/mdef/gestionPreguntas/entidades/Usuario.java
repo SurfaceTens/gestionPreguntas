@@ -98,7 +98,6 @@ public class Usuario implements UserDetails {
 	}
 
 	public void setPassword(String password) {
-		System.out.println("PWD DESDE METODO SETTER: " + password);
 		this.password = password;
 	}
 
